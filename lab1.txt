@@ -36,7 +36,7 @@ CREATE TABLE course7 (
 	std_id INT,
 	course_name VARCHAR(20),
     DeptName VARCHAR(50),
-	FOREIGN KEY (std_id) REFERENCES students7(std_id);
+	FOREIGN KEY (std_id) REFERENCES students7(std_id)
 );
 
 
@@ -53,7 +53,7 @@ INSERT INTO course7 (crs_id, std_id, course_name, DeptName)
 VALUES (104, 4, 'Data Structures', 'Software Engineering');
 
 INSERT INTO course7 (crs_id, std_id, course_name, DeptName) 
-VALUES (105, 5, 'Artificial Intelligence', 'Computer Science');
+VALUES (105, 5, 'AI', 'Computer Science');
 
 --------------------------------
 SUB QUERIES:
@@ -84,4 +84,5 @@ SUB QUERIES:
 => select First_name from students7 where std_id in (select std_id from course7 where course_name in(select course_name from course7 where std_id=(select std_id from students7 where First_name='vivek')));
 
 9. GET NAMES OF STUDENTS WHO ARE ENROLLED IN MORE THAN 1 COURSE
+
 => select First_name from students7 where std_id in (select std_id from course7 group by std_id having count(crs_id)>1);
