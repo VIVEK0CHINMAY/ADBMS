@@ -1,0 +1,174 @@
+										LAB 6
+========================================================================================
+							1. PROGRAM TO STRUCTURED TYPE 
+========================================================================================
+create type address_type3 as object(
+street varchar(100),
+city varchar(20),
+zip_code varchar(30));
+/
+
+create table customer49(
+cust_id int primary key,
+name varchar(20),
+address address_type3);
+
+
+INSERT INTO customer49 VALUES (1, 'vivek',('123 main st','new york','10001'));
+INSERT INTO customer49 VALUES(2, 'bhuvan', address_type3('124 main st','new york','10002'));
+INSERT INTO customer49 VALUES(3, 'alok', address_type3('125 main st','australia','10003'));
+INSERT INTO customer49 VALUES(4, 'raju', address_type3('126 main st','india','10004'));
+INSERT INTO customer49 VALUES(5, 'manoj',address_type3('127 main st','london','10005'));
+
+OUTPUT
+------------------------------
+SQL> select * from customer49;
+
+	CUST_ID NAME
+	---------- --------------------
+	ADDRESS(STREET, CITY, ZIP_CODE)
+	-----------------------------------------------------------------------
+			1 vivek
+	ADDRESS_TYPE3('123 main st', 'new york', '10001')
+	
+			2 bhuvan
+	ADDRESS_TYPE3('124 main st', 'new york', '10002')
+	
+			3 alok
+	ADDRESS_TYPE3('125 main st', 'australia', '10003')
+
+			4 raju
+	ADDRESS_TYPE3('126 main st', 'india', '10004')
+
+			5 manoj
+	ADDRESS_TYPE3('127 main st', 'london', '10005')
+
+
+
+
+========================================================================================
+										ARRAYS
+========================================================================================
+
+2.PROGRAM TO STRUCTURED TYPE ARRAYS
+=====================================
+
+CREATE OR REPLACE TYPE tag_array1 AS VARRAY(10) OF VARCHAR2(20);
+/
+
+create table product50(
+pro_id int primary key,
+pro_name varchar(20),
+tags tag_array1);
+
+INSERT INTO product50 VALUES (1, 'mouse',tag_array1('electronics','gadgets','computer'));
+INSERT INTO product50 VALUES(2, 'keyboard', tag_array1('electronics','gadgets','computer'));
+INSERT INTO product50 VALUES(3, 'powder', tag_array1('beauty','face','cosmetics'));
+INSERT INTO product50 VALUES(4, 'lipstick', tag_array1('beauty','face','cosmetics'));
+INSERT INTO product50 VALUES(5, 'broom',tag_array1('hardware','household','FMGP'));
+
+OUTPUT
+-------------------------------------
+
+SQL> select * from product50;
+    PRO_ID PRO_NAME
+---------- --------------------
+TAGS
+-------------------------------------------------------------------------
+         1 mouse
+TAG_ARRAY1('electronics', 'gadgets', 'computer')
+
+         2 keyboard
+TAG_ARRAY1('electronics', 'gadgets', 'computer')
+
+         3 powder
+TAG_ARRAY1('beauty', 'face', 'cosmetics')
+
+         4 lipstick
+TAG_ARRAY1('beauty', 'face', 'cosmetics')
+
+         5 broom
+TAG_ARRAY1('hardware', 'household', 'FMGP')
+
+	
+1. SELECT p.pro_id,p.pro_name,t.column_value as tag from product50 p,table(p.tags)t;
+	
+    PRO_ID PRO_NAME             TAG
+---------- -------------------- --------------------
+         1 mouse                electronics
+         1 mouse                gadgets
+         1 mouse                computer
+         2 keyboard             electronics
+         2 keyboard             gadgets
+         2 keyboard             computer
+         3 powder               beauty
+         3 powder               face
+         3 powder               cosmetics
+         4 lipstick             beauty
+         4 lipstick             face
+         4 lipstick             cosmetics
+         5 broom                hardware
+         5 broom                household
+         5 broom                FMGP
+		 
+2. SELECT p.pro_id,p.pro_name,t.column_value as tag from product50 p,table(p.tags)t where t.column_value='gadgets';
+
+    PRO_ID PRO_NAME             TAG
+---------- -------------------- --------------------
+         1 mouse                gadgets
+         2 keyboard             gadgets
+
+3. SELECT p.pro_id,p.pro_name, count(t.column_value) as num_tags from product50 p,table(p.tags)t group by p.pro_id,p.pro_name;
+
+    PRO_ID PRO_NAME               NUM_TAGS
+---------- -------------------- ----------
+         5 broom                         3
+         2 keyboard                      3
+         1 mouse                         3
+         4 lipstick                      3
+         3 powder                        3
+		 
+
+========================================================================================
+										OOPS
+========================================================================================
+
+CREATE OR REPLACE TYPE person_type AS OBJECT (
+  per_id       NUMBER,
+  f_name       VARCHAR2(20),
+  l_name       VARCHAR2(20),
+  dob          DATE,
+  MEMBER FUNCTION get_age RETURN NUMBER,
+  MEMBER FUNCTION get_full_name RETURN VARCHAR2
+);
+/
+ 
+CREATE OR REPLACE TYPE BODY person_type AS
+
+  MEMBER FUNCTION get_age RETURN NUMBER IS
+  BEGIN
+    RETURN FLOOR(MONTHS_BETWEEN(SYSDATE, dob) / 12);
+  END get_age;
+
+  MEMBER FUNCTION get_full_name RETURN VARCHAR2 IS
+  BEGIN
+    RETURN f_name || ' ' || l_name;
+  END get_full_name;
+
+END;
+/
+ 
+SET SERVEROUTPUT ON;
+
+DECLARE
+  p person_type;
+BEGIN
+
+  p := person_type(1, 'Vivek', 'Chinmay', DATE '2004-06-16');
+  
+  DBMS_OUTPUT.PUT_LINE('Full name: ' || p.get_full_name);
+  DBMS_OUTPUT.PUT_LINE('Age: ' || p.get_age);
+END;
+/
+ 
+
